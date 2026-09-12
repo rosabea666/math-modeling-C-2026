@@ -33,13 +33,26 @@
 - **编译**：`cd CUMCM2026-Template && latexmk main.tex`（`.latexmkrc` 已设 `$pdf_mode=5` + `$bibtex_use=0`，参考文献是手工 `thebibliography`，**不用 bibtex/biber**）。latexmk 需把 `C:/texlive/2026/bin/windows` 加进 PATH。`main_template_example.tex` = 原模板示例。**minted 在本机不可用**，附录用 fancyvrb 的 `\VerbatimInput`。
 - **标签规范**：`sec:|fig:|tab:|eq:|app:` + `qN-` + 小写连字符；正文一律 `\ref`/`\eqref`/`\S\ref`，不写死编号。`\graphicspath{{figures/}}`，`\includegraphics` 只写文件名。
 - **等价性验证手法**：PyMuPDF 逐页 `page.get_text()` 比对新旧 PDF（本次重构后 35/35 页文本逐字一致）。
-- **配图约定**：`CUMCM2026-Template/figures/` 只放 16 个矢量 PDF，命名 `p1_fig1-3`（问题一）、`p2_fig1-7`（问题二）、`p3_fig1-6`（问题三），来源即 `问题*/图片/fig*.pdf` 的副本。**换图 = 复制进来 + 裁白边**（见下），不要再去跑 q_paper_figures.py（那是旧 png 链路）。
+- **配图约定**：`CUMCM2026-Template/figures/` 只放 16 个矢量 PDF，命名 `p1_fig1-3`（问题一）、`p2_fig1-7`（问题二）、`p3_fig1-6`（问题三），来源即 `问题*/图片/fig*.pdf` 的副本。**问题四不配图**（用户决定）。**换图 = 复制进来 + 裁白边**（见下），不要再去跑 q_paper_figures.py（那是旧 png 链路）。
+- **表格排版坑（Q4 新增，两次踩）**：中文长单元格**不要**用固定列宽的 `tabular`（会 Overfull 或 Underfull badness 10000）；一律用 `\begin{tabularx}{\textwidth}{lXcc}` 让文字列走 `X`。列数多（≥4 个中文列）时用 `\footnotesize` + `clXX` 紧凑版，否则触发 "Float too large for page"。
+- **符号表已按问题拆分**：`tab:sym-common`（问题一至三）与 `tab:sym-q34`（问题三预报通道＋问题四实时电价）。加符号先判断归哪张，别塞回单张表（会 Float too large）。
 - **裁白边**：这些 matplotlib PDF 是整幅 A4 页，内容只占中间一块。必须用 PyMuPDF 取 drawings+text+image 的并集外接框 `set_cropbox()` 再存，否则图和页面都会大片留白。
 - **版式纪律**：`[H]` 浮动体放不下会把整页剩余留白（曾出现整页空白）→ 图/表一律 `[htbp]`。编译后用 pdftotext 按 `\f` 切页扫"稀疏页"（每页 <500 字符即人工复核）。
 - **中文字体缺字**：带圈数字 ①②③、希腊 β 等会被 xeCJK 判为西文而显示空白，导言区加 `\xeCJKDeclareCharClass{CJK}{"2460 -> "2473, "0370 -> "03FF}`。
-- 论文现状：问题一、二、三已成文（35 页，0 warning）；**问题四仍留白**。
+- 论文现状：**问题一至问题四全部成文**（48 页，0 warning / 0 undefined / 0 overfull / 0 underfull / 0 missing char）。
+
+## 问题四（Q4）资产与口径
+- **本机只有**：`问题四/Q4论文初稿.md`、`问题四/README.md`、`问题四/result4-2.xlsx`、`问题四/result4-3.xlsx`。
+  初稿引用的 `scripts/q4_model_v3.py`、`scripts/q4_check_v3.py`、`results/q4_v3/`、4 张 `fig_q4*.pdf` **全盘不存在**。
+- **Q4 结果**（初稿数字，已部分独立复核）：F_48（Q2 分支）**1438.2280 万**、G_48（Q3 分支）**1404.2431 万**；
+  48h 时域收益 −11.08 / −6.70 万（合计 17.78）；价格预知价值 **7.7030 万**（同政策对照）；严格下界 1277.9221 万。
+- **已独立复核通过**：附件 4 全部 8 项统计量；两 xlsx 的合同费（1395.1120 / 1351.6506）与附加费（18.3849）**逐位吻合**。
+  未复核：20 个配置费用、选择器实验、终端归一化 → 正文按初稿原值呈现，未声称全量核验。
+- **Q4 章节为纯文字＋表格（9 表 0 图）**，用户明确要求不加图不加代码。
+- xlsx 结构：`result4-2` 三表（计划购电量 335×147 / 充放电量 / 紧急购电量）；`result4-3` 四表（多"调整购电量"）。评价期 2/1–12/31 共 334 天。
 
 ## 未决
 - **问题三无结果文件**：`results/` 下没有 `result3.xlsx`，也没有 Q3 计算脚本；只有 `问题三/代码/代码.md`（含 `...` 占位的草稿）与 6 张结果图（外部产出）。故论文 Q3 章节**缺题面要求的"指定日期表1/表2/表3"**，正文数字只取自图注。补表需先实现并跑通 Q3 全链路。
+- **问题四无代码无图**：论文 Q4 章节纯文字＋表格。若后续补齐 `q4_model_v3.py` 等材料，可在附录加代码、在正文插图，并补做 20 配置的完整复核。
 - **O6**：结果模板列槽位映射冲突（默认按列序 1:1 提交）。**O8**：kW→kWh 积分规则未消除，与 O6 独立。
 - 外部方案 1356.64 万元未核验、本文档不归因。

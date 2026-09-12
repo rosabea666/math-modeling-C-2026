@@ -28,6 +28,15 @@
 - 多候选 × 顺序仿真要先堆叠成 (J,S,T) 一次性前推，比朴素快约 13×。
 - 重定向到文件的日志要 `line_buffering=True`，否则长时间空白。
 
+## 论文（LaTeX，CUMCM2026-Template/）
+- `main.tex` = 正式论文（ctexart + cumcm2026.sty，**XeLaTeX**，本机 `C:/texlive/2026/bin/windows/xelatex.exe`）。`main_template_example.tex` = 原模板示例。**minted 在本机不可用**，附录用 fancyvrb 的 `\VerbatimInput`。
+- **配图约定**：`CUMCM2026-Template/figures/` 只放 16 个矢量 PDF，命名 `p1_fig1-3`（问题一）、`p2_fig1-7`（问题二）、`p3_fig1-6`（问题三），来源即 `问题*/图片/fig*.pdf` 的副本。**换图 = 复制进来 + 裁白边**（见下），不要再去跑 q_paper_figures.py（那是旧 png 链路）。
+- **裁白边**：这些 matplotlib PDF 是整幅 A4 页，内容只占中间一块。必须用 PyMuPDF 取 drawings+text+image 的并集外接框 `set_cropbox()` 再存，否则图和页面都会大片留白。
+- **版式纪律**：`[H]` 浮动体放不下会把整页剩余留白（曾出现整页空白）→ 图/表一律 `[htbp]`。编译后用 pdftotext 按 `\f` 切页扫"稀疏页"（每页 <500 字符即人工复核）。
+- **中文字体缺字**：带圈数字 ①②③、希腊 β 等会被 xeCJK 判为西文而显示空白，导言区加 `\xeCJKDeclareCharClass{CJK}{"2460 -> "2473, "0370 -> "03FF}`。
+- 论文现状：问题一、二、三已成文（35 页，0 warning）；**问题四仍留白**。
+
 ## 未决
+- **问题三无结果文件**：`results/` 下没有 `result3.xlsx`，也没有 Q3 计算脚本；只有 `问题三/代码/代码.md`（含 `...` 占位的草稿）与 6 张结果图（外部产出）。故论文 Q3 章节**缺题面要求的"指定日期表1/表2/表3"**，正文数字只取自图注。补表需先实现并跑通 Q3 全链路。
 - **O6**：结果模板列槽位映射冲突（默认按列序 1:1 提交）。**O8**：kW→kWh 积分规则未消除，与 O6 独立。
 - 外部方案 1356.64 万元未核验、本文档不归因。

@@ -349,6 +349,14 @@ INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex9.tfm
 INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
 INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
 INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmr9.tfm
+INPUT ./figures/p4_fig1.pdf
+INPUT ./figures/p4_fig1.pdf
+INPUT ./figures/p4_fig3.pdf
+INPUT ./figures/p4_fig3.pdf
+INPUT ./figures/p4_fig2.pdf
+INPUT ./figures/p4_fig2.pdf
+INPUT ./figures/p4_fig4.pdf
+INPUT ./figures/p4_fig4.pdf
 INPUT ./sections/09-evaluation.tex
 INPUT ./sections/09-evaluation.tex
 INPUT ./sections/09-evaluation.tex
@@ -366,6 +374,7 @@ INPUT ./backmatter/appendix.tex
 INPUT backmatter/appendix.tex
 INPUT code/q1_core.py
 INPUT code/q2_core.py
+INPUT code/q4_core.py
 INPUT main.aux
 INPUT ./main.out
 INPUT ./main.out

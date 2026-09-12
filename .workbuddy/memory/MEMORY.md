@@ -29,7 +29,10 @@
 - 重定向到文件的日志要 `line_buffering=True`，否则长时间空白。
 
 ## 论文（LaTeX，CUMCM2026-Template/）
-- `main.tex` = 正式论文（ctexart + cumcm2026.sty，**XeLaTeX**，本机 `C:/texlive/2026/bin/windows/xelatex.exe`）。`main_template_example.tex` = 原模板示例。**minted 在本机不可用**，附录用 fancyvrb 的 `\VerbatimInput`。
+- **模块化结构（2026-09-12 重构）**：`main.tex`（65 行）= 文档类 + 元数据 + `\input` 装配；正文在 `sections/00-abstract … 09-evaluation.tex`（序号 = `\section` 顺序）；导言区在 `preamble/{packages,fonts,layout}.tex`；参考文献与附录在 `backmatter/`。**加章节 = 新建文件 + 在 main.tex 登记**（用 `\input` 不用 `\include`，避免插页）。
+- **编译**：`cd CUMCM2026-Template && latexmk main.tex`（`.latexmkrc` 已设 `$pdf_mode=5` + `$bibtex_use=0`，参考文献是手工 `thebibliography`，**不用 bibtex/biber**）。latexmk 需把 `C:/texlive/2026/bin/windows` 加进 PATH。`main_template_example.tex` = 原模板示例。**minted 在本机不可用**，附录用 fancyvrb 的 `\VerbatimInput`。
+- **标签规范**：`sec:|fig:|tab:|eq:|app:` + `qN-` + 小写连字符；正文一律 `\ref`/`\eqref`/`\S\ref`，不写死编号。`\graphicspath{{figures/}}`，`\includegraphics` 只写文件名。
+- **等价性验证手法**：PyMuPDF 逐页 `page.get_text()` 比对新旧 PDF（本次重构后 35/35 页文本逐字一致）。
 - **配图约定**：`CUMCM2026-Template/figures/` 只放 16 个矢量 PDF，命名 `p1_fig1-3`（问题一）、`p2_fig1-7`（问题二）、`p3_fig1-6`（问题三），来源即 `问题*/图片/fig*.pdf` 的副本。**换图 = 复制进来 + 裁白边**（见下），不要再去跑 q_paper_figures.py（那是旧 png 链路）。
 - **裁白边**：这些 matplotlib PDF 是整幅 A4 页，内容只占中间一块。必须用 PyMuPDF 取 drawings+text+image 的并集外接框 `set_cropbox()` 再存，否则图和页面都会大片留白。
 - **版式纪律**：`[H]` 浮动体放不下会把整页剩余留白（曾出现整页空白）→ 图/表一律 `[htbp]`。编译后用 pdftotext 按 `\f` 切页扫"稀疏页"（每页 <500 字符即人工复核）。

@@ -1,0 +1,18 @@
+% =========================================================================
+% 宏包声明
+% -------------------------------------------------------------------------
+% 第一行是本模板的样式文件，随后是本文额外的宏包。
+% cumcm2026.sty 已统一加载以下宏包，本文不再重复声明：
+%   geometry, amsmath, amssymb, amsthm, mathtools, graphicx,
+%   booktabs, tabularx, multirow, float, caption, enumitem,
+%   xcolor, listings, fancyhdr, hyperref
+%
+% 注：本机 minted 不可用（需 -shell-escape 与 Pygments），故附录程序清单
+%     统一使用 fancyvrb 的 \VerbatimInput 逐字输入，不使用 minted 环境。
+% =========================================================================
+
+% 模板样式：版式、页码、摘要环境、\mcmkeywords 与超链接设置均在此。
+\usepackage{cumcm2026}
+
+% 附录程序清单的逐字输入命令 \VerbatimInput。
+\usepackage{fancyvrb}

@@ -1,0 +1,144 @@
+% =========================================================================
+% 五、问题二：序贯决策模型
+% =========================================================================
+
+\section{问题二：不确定条件下序贯决策模型的建立与求解}
+
+\subsection{三层滚动决策框架}
+\label{sec:q2-frame}
+
+每天 0:00 起依次完成三步（图~\ref{fig:q2-frame}）：
+\begin{enumerate}
+  \item \textbf{预测层}（\S\ref{sec:q2-forecast}）：由历史实测构造当天净负载预测 $\widehat N_t^{(d)}$；
+  \item \textbf{计划层}（\S\ref{sec:q2-lp}）：以 $\widehat N^{(d)}$ 与日初电量 $E_0^{(d)}$ 求解日计划线性规划，输出计划购电量 $b_t$（提交结算）与计划充电意图 $c_t$（执行参考）；
+  \item \textbf{执行层}（\S\ref{sec:q2-exec}）：日内按实测 $N_t^{(d)}$ 逐区间实现物理平衡，尽限充放电，不足部分紧急购电；日末电量 $E_H^{(d)}$ 成为次日日初电量 $E_0^{(d+1)}$。
+\end{enumerate}
+费用按 \S\ref{sec:q2-exec} 的口径逐日结算，全年评价。核心程序见附录~\ref{app:q2-code}。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{p2_fig1.pdf}
+  \caption{主方案 E 的``预测—计划—执行''三层滚动决策框架}
+  \label{fig:q2-frame}
+\end{figure}
+
+\subsection{预测层：星期偏差校正的分布预测}
+\label{sec:q2-forecast}
+
+预测由三项相加构成：
+\begin{equation}
+  \widehat N_{d,t}\;=\;\underbrace{m^{\mathrm{r}}_{d,t}}_{\text{近期水平}}\;+\;\underbrace{\gamma\cdot\Delta^{\mathrm{w}}_{d,t}}_{\text{星期偏差校正}}\;+\;\underbrace{M_{\beta,t}}_{\text{分位裕量}} .
+  \label{eq:q2-forecast}
+\end{equation}
+
+\textbf{（一）近期水平。}取 $d$ 之前最近 $W$ 天实测净负载在时段 $t$ 上的中位数：
+\begin{equation}
+  m^{\mathrm{r}}_{d,t}=\operatorname*{median}_{s\in[d-W,\;d)}\; N_t^{(s)} .
+\end{equation}
+用中位数而非均值，是为了对极端天气日稳健；$W$ 反映``水平记忆''的长度，过短则噪声大，过长则跟不上季节漂移。
+
+\textbf{（二）星期偏差。}记 $w(d)\in\{0,\dots,6\}$ 为 $d$ 的星期序号，取 $d$ 之前最近的 $N_{\mathrm{DOW}}$ 个满足 $w(s)=w(d)$ 的日期，对每一天计算``当日实测减当日近期水平''，再取平均：
+\begin{equation}
+  \Delta^{\mathrm{w}}_{d,t}=\frac{1}{|\mathcal S_d|}\sum_{s\in\mathcal S_d}\Bigl(N_t^{(s)}-m^{\mathrm{r}}_{s,t}\Bigr),\qquad
+  \mathcal S_d=\{s<d:\ w(s)=w(d)\}\ \text{中最近的 } N_{\mathrm{DOW}} \text{ 个}.
+\end{equation}
+这一项刻画``该星期几相对其近期水平的系统性日内形状偏移''；以``实测减该日近期水平''归一化是为了剔除季节漂移。$\gamma\in[0,1]$ 为校正强度，$\gamma=0$ 即退化为不含星期校正的纯水平预测。图~\ref{fig:q2-forecast} 以一个演示周为例展示了式~\eqref{eq:q2-forecast} 各分量的贡献与星期偏差修正项的形态。
+
+\textbf{（三）分位裕量。}前两项只给出条件中心趋势，残余随机波动仍以 5 倍价惩罚。对每个时段 $t$ 单独取近期残差的 $\beta$ 上尾分位数：
+\begin{equation}
+  M_{\beta,t}=\max\Bigl\{\,Q_\beta\bigl\{N_t^{(s)}-m^{\mathrm{r}}_{s,t}-\gamma\Delta^{\mathrm{w}}_{s,t}\bigr\}_{s\in[d-W,\,d)},\ 0\Bigr\} .
+\end{equation}
+取 $\max\{\cdot,0\}$ 是为了避免负预留导致系统性的少计划。其经济逻辑与报童模型一致~\cite{newsvendor}：单位低估代价（$5p$ 与触发概率之积）远大于单位高估代价（$p$），最优计划量应落在需求分布的某个上分位数。单时段简化情形下临界分位数为 $5p/(5p+p)=0.83$；但储能提供跨时段物理缓冲，改变了边际代价结构，$\beta$ 不直接套用理论值，而由回放择优（\S\ref{sec:q2-walkforward}）。
+
+\textbf{（四）冷启动回退。}当 $d<30$（1 月内）时，历史不足以估计上述三项，预测器整体回退为附件 1 的代表日净负载曲线；辅助的中位数函数在可用历史不足 7 天时返回零向量，此时预测器已由上一规则回退，不会使用该零向量。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{p2_fig2.pdf}
+  \caption{预测构成示例：(a)~演示周内预测各分量对比；(b)~星期偏差修正项}
+  \label{fig:q2-forecast}
+\end{figure}
+
+\subsection{参数选取：逐月 walk-forward 协议}
+\label{sec:q2-walkforward}
+
+待选参数为四元组 $\theta=(\beta, W, \gamma, N_{\mathrm{DOW}})$。选取协议：
+\begin{enumerate}
+  \item 构造候选网格 $\beta\in\{0.70,0.75\}$，$W\in\{7,14\}$，$\gamma\in\{0,0.5,1.0\}$，$N_{\mathrm{DOW}}\in\{4,6,10\}$，共 36 个候选；
+  \item 每个候选全年独立回放一次（从 1 月 1 日 6000 kWh 起连续滚动，得到逐日累计费用序列）；
+  \item 第 $m$ 月（$m=2,\dots,12$）使用的参数，取截至 $m-1$ 月月末累计费用最小的候选：
+  \begin{equation}
+    \theta^{\ast}_m=\arg\min_{\theta}\; J^{(\theta)}_{\le\,\text{月末}(m-1)} .
+  \end{equation}
+\end{enumerate}
+因此参数\textbf{逐月更新}，而非在 1 月一次选定后全年冻结。
+
+\textbf{冷启动期的信息量限制（必须说明）。}由于 $d<30$ 时所有候选共用同一条回退预测，各候选在 1 月 1--30 日的逐日费用完全相同；2 月首次选参时，区分候选的费用信息实际上只来自 1 月 31 日单日。该局限源于算法定义本身，本文不以事后调参加以掩盖；3 月及以后各月可用历史不少于 30 天，选参信息量随之增加。
+
+逐月选出的日程见表~\ref{tab:q2-sched}：11 个月一致地选中 $\gamma=1.0$（完全采用星期偏差校正）与 $N_{\mathrm{DOW}}=4$；$\beta$ 在 2--3 月为 0.70、4 月起为 0.75；$W$ 全程为 7。
+
+\begin{table}[H]
+  \centering
+  \caption{逐月 walk-forward 选出的参数日程}
+  \label{tab:q2-sched}
+  \begin{tabular}{lccccccccccc}
+    \toprule
+    月份 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 \\
+    \midrule
+    $\beta^\ast$ & 0.70 & 0.70 & 0.75 & 0.75 & 0.75 & 0.75 & 0.75 & 0.75 & 0.75 & 0.75 & 0.75 \\
+    $W^\ast$ & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 & 7 \\
+    $\gamma^\ast$ & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 \\
+    $N_{\mathrm{DOW}}^\ast$ & 4 & 4 & 4 & 4 & 4 & 4 & 4 & 4 & 4 & 4 & 4 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{关于网格边界}：$\gamma=1.0$ 与 $N_{\mathrm{DOW}}=4$ 均位于本文网格边界上。对 $\gamma$，另设置上界扩展至 1.5 的网格（147 个候选），未改变选择结果；对 $N_{\mathrm{DOW}}$，另设置加密网格（28 个候选），所得费用略高 0.79 万元。这些结果只表明``在本文所考察的网格上未发现更优点''，\textbf{不构成全局最优性的证明}。
+
+\subsection{计划层：日循环线性规划}
+\label{sec:q2-lp}
+
+给定预测 $\widehat N_t$ 与日初电量 $E_0^{(d)}$，计划层求解：
+\begin{align}
+  \min\ & \sum_{t=0}^{H-1} p_t\, b_t \\
+  \text{s.t.}\quad
+  & b_t+d_t=\widehat N_t+c_t+w_t,\qquad E_{t+1}=E_t+\eta_c c_t-\frac{d_t}{\eta_d}, \\
+  & E_{\min}\le E_t\le E_{\max},\qquad 0\le c_t,d_t\le \tfrac{5000}{6},\qquad b_t,w_t\ge 0,\qquad \widehat E_H=E_0^{(d)} .
+\end{align}
+末式为\textbf{日循环约束}：计划轨迹的末端电量等于当日日初电量。两点说明：
+\begin{enumerate}
+  \item 计划层不含紧急购电项，因为计划必须自足；紧急购电只发生在执行层；
+  \item \textbf{日循环仅为计划层的边界条件，不构成对实际运行的约束。}实际 $E_H^{(d)}$ 由执行层按实测决定，可以高于或低于 $E_0^{(d)}$，并自然结转至次日。本文计划层不设任何期末下限。
+\end{enumerate}
+问题一关于充放电互斥松弛精确性的命题在此同样成立（目标系数非负结构不变），无需引入二元变量。
+
+\subsection{执行层：尽限充放电与结算}
+\label{sec:q2-exec}
+
+\textbf{尽限充放电规则。}逐区间比较计划供能 $b_t$ 与实测 $N_t^{(d)}$，令 $\mathrm{net}=b_t-N_t^{(d)}$：
+\begin{itemize}
+  \item $\mathrm{net}\ge0$（有盈余）：在储能可充空间、功率上限与计划充电意图之内\textbf{尽可能充入}，余量为弃置 $w_t$；
+  \item $\mathrm{net}<0$（有缺口）：在储能可放空间与功率上限之内\textbf{尽可能放出}，仍不足的部分即为紧急购电 $e_t$。
+\end{itemize}
+该规则在有缺口时即时释放可用电量，可直接降低 5 倍电价的紧急购电量；且完全因果，仅使用当前区间的实测值与当前储电量。执行层不允许以普通电价补购未计划电量，与题意的结算口径一致。
+
+\textbf{跨日衔接。}日末电量 $E_H^{(d)}$ 直接成为次日日初电量 $E_0^{(d+1)}$，全年连续；评价期 2 月 1 日统一从 10800 kWh 起评。
+
+\textbf{结算。}第 $d$ 天费用为
+\begin{equation}
+  J^{(d)}=\sum_{t}p_t\,b_t^{(d)}\;+\;\sum_{t}5p_t\,e_t^{(d)} ,
+  \label{eq:q2-cost}
+\end{equation}
+第一项为计划费（按计划购电量全额结算，无论是否消纳），第二项为紧急费（按交易时刻电价的 5 倍）。两项\textbf{分别核算}：$b_t$ 与 $e_t$ 是物理上不同的两笔电量，不可合并计算。全年指标为评价期 334 天费用之和。
+
+\subsection{完美信息参照方案（不可实施）}
+
+为标定``信息约束''这一项的价值，设一个\textbf{不可实施}的参照方案：物理模型、结算规则、计划层日循环、执行层尽限充放电、起评电量 10800 kWh、评价期 334 天全部与主方案相同，唯一差别是把计划层的 $\widehat N$ 换成当天实测净负载（即日内先知）。其评价期费用为 \textbf{1229.10 万元}（紧急费用为 0）。该参照并非主方案费用的下界（它同样受日循环约束，且预测器不同），仅用于表明``在本文的物理与结算口径下，信息完全时的费用水平''。
+
+\subsection{求解流程与数值校验}
+
+主方案全部结果由 \texttt{scripts/q2\_finalize\_E.py} 一条命令复现：① 读取附件 1/2 并折算电量口径；② 按 \S\ref{sec:q2-walkforward} 逐月取参数 $\to$ \S\ref{sec:q2-forecast} 预测 $\to$ \S\ref{sec:q2-lp} 计划层线性规划 $\to$ \S\ref{sec:q2-exec} 执行层仿真；③ 逐日记录 $b,c,d,e,w,E$；④ 写出 \texttt{result2.xlsx} 与指定日期的三张表。
+
+\textbf{执行器自洽性检查}：将``实测净负载''设为计划所用预测序列时，执行器应精确复现线性规划给出的计划。实测紧急购电总量 $1.1\times10^{-13}$ kWh、充/放电偏差 $<5\times10^{-13}$ kWh、末端储电量偏差为 0，说明计划—执行衔接无结构性损失。
+
+\textbf{全程校验}（评价期）：能量平衡最大残差 $\le1.2\times10^{-13}$ kWh；储电量全程位于 $[1200,10800]$；跨日储电量断裂为 0（次日日初严格等于上一日日末）；计划费与紧急费独立复算一致。主方案评价期总费用 1395.6995 万元由选参、风险档案、提交表三条独立路径各自复算，\textbf{逐位一致}。

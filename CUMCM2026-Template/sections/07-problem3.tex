@@ -1,0 +1,197 @@
+% =========================================================================
+% 七、问题三：滚动合同调整模型
+% =========================================================================
+
+\section{问题三：多时刻预报下滚动合同调整模型的建立与求解}
+
+\subsection{信息结构与结算规则}
+\label{sec:q3-frame}
+
+问题二只有``计划—执行''两层：0:00 计划一经制定即为结算依据，实测缺口只能按 5 倍价紧急补足。问题三在两点上改变了这一结构：
+
+\begin{enumerate}
+  \item \textbf{信息增加}：除 0:00 外，6:00、12:00、18:00 还可获得未来 24 小时整点光伏预报（附件 3），因而日内可以滚动更新对剩余时段光伏出力（进而净负载）的认识；
+  \item \textbf{结算增加}：允许在预报时刻\textbf{重新约定}剩余时段的购电量，但双向偏离 0:00 计划都要付费——\textbf{计划高于调整}的差额按 $0.5p_t$ 的违约电价结算，\textbf{调整高于计划}的差额按 $1.5p_t$ 结算；紧急购电仍为 $5p_t$。
+\end{enumerate}
+
+由此形成``计划—调整—执行''三层结构：在问题二框架（图~\ref{fig:q2-frame}）的``计划层''与``执行层''之间，插入一个在每个预报时刻重复触发的\textbf{调整层}。此时需定量回答两个问题：\textbf{(i)} 日内调整机会本身的价值；\textbf{(ii)} 在 6:00、12:00、18:00 三个时刻使用预报（而非仅在 0:00 使用一次）是否经济。后者是题面明确要求分析的问题。
+
+\subsection{预报通道与净负载预测}
+\label{sec:q3-forecast}
+
+\textbf{（一）整点预报转区间电量。}附件 3 只给出逐日四个发布时刻对未来 24 小时\textbf{整点}的光伏功率预报。记发布时刻为 $\tau\in\{0,6,12,18\}$、其预报曲线为 $f_\tau(h)$，将其在相邻整点间线性插值、再在 10 分钟区间上积分，得区间电量
+\begin{equation}
+  \widetilde V_t(\tau)=\tfrac12\bigl[f_\tau(\tau_t)+f_\tau(\tau_{t+1})\bigr]\Delta t ,
+  \label{eq:q3-pv}
+\end{equation}
+其中 $\tau_t=t\Delta t$ 为区间起点时刻。$\tau>0$ 时曲线端点以\textbf{当日已实测光伏功率的水平}锚定（而非初值或瞬时值），以削弱插值端点的噪声；$\tau=0$ 通道该时刻尚无实测，端点取零。
+
+\textbf{（二）0:00 通道的预报融合。}问题二预测器所用的光伏分量来自历史经验形状，而附件 3 提供了当日的光伏预报，故可对预测作一步收缩修正：
+\begin{equation}
+  \widehat N_t \;=\; \underbrace{\bigl(m^{\mathrm{r}}+\gamma\Delta^{\mathrm{w}}+M_\beta\bigr)_t}_{\text{问题二预测器（式~\eqref{eq:q2-forecast}）}}\;-\;\kappa_g\Bigl[\widetilde V_t(0)-\widehat V_t^{\mathrm{hist}}\Bigr],
+  \label{eq:q3-fuse}
+\end{equation}
+$\widehat V_t^{\mathrm{hist}}$ 为问题二预测器隐含的光伏分量，$\kappa_g\in[0,1]$ 为\textbf{分档收缩系数}，按预报时长 $h$ 分三档 $g\in\{[0,6),[6,12),[12,24)\}$。$\kappa_g$ 由\textbf{过去 $K=30$ 天}的因果滚动回归估计：
+\begin{equation}
+  \kappa_g=\mathrm{clip}\!\left(-\frac{\sum_s r_s x_s}{\sum_s x_s^{2}},\,0,\,1\right),\qquad
+  r_s=N^{(s)}-\widehat N^{(s)}_{\text{基准}},\quad x_s=\widetilde V^{(s)}(0)-\widehat V^{(s)}_{\mathrm{hist}} ,
+  \label{eq:q3-kappa}
+\end{equation}
+即用``实测净负载残差''对``两条预报通道的差值''回归；取负号是因为光伏预报上调（$x>0$）意味着净负载下调，截断在 $[0,1]$ 以避免过度修正。样本不足 7 天时取 $\kappa_g=0$，退回问题二预测器。$\kappa_g$ 每日仅用 $d-K,\dots,d-1$ 的数据重估，保持与问题二一致的因果口径。
+
+\subsection{调整层：带双向违约价的剩余时段线性规划}
+\label{sec:q3-adjust}
+
+在 $\tau\in\{6,12,18\}$，先按\textbf{当前生效合同}执行完上一段区间，得到该时刻的实测储电量 $E_\tau$；再对剩余区间 $t\ge t_\tau$ 重新求解合同 $b'_t$：
+\begin{equation}
+\begin{aligned}
+  \min\;\; & \sum_{t\ge t_\tau} p_t b'_t \;+\; \tfrac12\!\!\sum_{t\ge t_\tau}\! p_t\,(u_t+v_t) \;+\; 5\!\!\sum_{t\ge t_\tau}\! p_t\,e_t \\
+  \text{s.t.}\;\;
+  & u_t\ \ge\ b_t^{\mathrm{plan}}-b'_t,\qquad v_t\ \ge\ b'_t-b_t^{\mathrm{plan}},\qquad u_t,\,v_t\ge 0, \\
+  & b'_t+d_t+e_t=\widehat N_t(\tau)+c_t+w_t,\qquad E_{t+1}=E_t+\eta_c c_t-\frac{d_t}{\eta_d},\\
+  & E_{\min}\le E_t\le E_{\max},\qquad 0\le c_t,\,d_t\le \tfrac{5000}{6},\qquad b'_t,\,e_t,\,w_t\ge0,\\
+  & E_{t_\tau}=E_\tau\ (\text{实测}),\qquad E_H=E_0^{(d)} ,
+\end{aligned}
+  \label{eq:q3-adjust}
+\end{equation}
+其中偏差始终对\textbf{0:00 计划} $b^{\mathrm{plan}}$ 计量（而非对上一次合同），故连续两次调整不产生重复计费。末式为计划层的日循环边界，同 \S\ref{sec:q2-lp}。
+
+\textbf{目标函数与题面结算规则的等价性。}式~\eqref{eq:q3-adjust} 只需一次线性规划即可同时表示下调的违约费和上调的加价，无需引入分段逻辑：
+\begin{itemize}
+  \item 当 $b'_t\le b_t^{\mathrm{plan}}$ 时，题面结算为 $p_tb'_t+\tfrac12p_t\bigl(b_t^{\mathrm{plan}}-b'_t\bigr)$，而 $\tfrac12p_t(u_t+v_t)$ 在该情形下恰取 $u_t=b_t^{\mathrm{plan}}-b'_t$、$v_t=0$，二者完全一致；
+  \item 当 $b'_t\ge b_t^{\mathrm{plan}}$ 时，$p_tb'_t+\tfrac12p_t\bigl(b'_t-b_t^{\mathrm{plan}}\bigr)=\tfrac32p_tb'_t-\tfrac12p_tb_t^{\mathrm{plan}}$，正是``超出部分按 1.5 倍、未超出部分按 1 倍''的结果。
+\end{itemize}
+紧急购电项 $5\sum p_te_t$ 与执行层共用同一口径，费用按 \S\ref{sec:q2-exec} 分别核算。
+
+\textbf{执行层。}仍采用 \S\ref{sec:q2-exec} 的尽限充放电规则，但以\textbf{最新生效合同}为交付基准；段与段之间实测储电量连续传递，日末电量结转为次日日初电量。评价期、起评储电量（10800 kWh）与问题二完全一致，便于横向比较。
+
+\subsection{两维对照：调整机会与 0:00 预报通道}
+\label{sec:q3-matrix}
+
+为把``信息''与``调整机会''两项改进分开计量，构造 $2\times2$ 方案矩阵（图~\ref{fig:q3-matrix}）：是否使用附件 3 的 0:00 预报通道（式~\eqref{eq:q3-fuse}）$\times$ 是否允许日内三次调整。
+
+\begin{table}[H]
+  \centering
+  \caption{0:00 预报通道 $\times$ 日内调整机会的费用矩阵（评价期 2025.2.1--12.31，334 天，万元）}
+  \label{tab:q3-matrix}
+  \begin{tabularx}{\textwidth}{lXcc}
+    \toprule
+    方案 & 设定 & 总费用 & 相对 A0 \\
+    \midrule
+    A0 & 不用 0:00 预报通道，不允许日内调整（$=$ 问题二主方案 E） & 1395.70 & — \\
+    A0K & 用 0:00 预报通道，不允许日内调整 & 1376.20 & $-19.50$ \\
+    B0 & 不用 0:00 预报通道，允许日内调整 & 1355.58 & $-40.12$ \\
+    \textbf{B1（主方案）} & \textbf{用 0:00 预报通道，允许日内调整} & \textbf{1345.71} & $\mathbf{-49.99}$ \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{p3_fig1.pdf}
+  \caption{0:00 预报通道与日内调整机会的总费用矩阵（万元）}
+  \label{fig:q3-matrix}
+\end{figure}
+
+由表~\ref{tab:q3-matrix} 与图~\ref{fig:q3-matrix} 可得三点结论：
+
+\begin{enumerate}
+  \item \textbf{A0 与问题二主方案完全重合}（1395.70 万元），说明问题二、问题三两条链路在同一评价口径下自洽——问题三的``不用预报通道、不允许调整''退化为问题二模型；
+  \item 单独引入日内调整降费 \textbf{40.12 万元}，单独引入 0:00 预报通道降费 \textbf{19.50 万元}；在本文的数据上，\textbf{调整机会的价值约为预报通道的两倍}；
+  \item 两项单独收益之和为 59.62 万元，而联合收益为 \textbf{49.99 万元}，\textbf{重叠 9.62 万元}。这说明两类改进\textbf{部分替代}：手中已有第二次决策机会时，0:00 预报的边际价值下降。因此两个数字不能简单相加，这正是必须做 $2\times2$ 对照而非单项消融的原因。
+\end{enumerate}
+
+B1 即本文问题三主方案，全年费用 \textbf{1345.71 万元}，相对问题二主方案节省 49.99 万元（$-3.58\%$）。
+
+\subsection{主方案的日内形态与逐月费用}
+\label{sec:q3-day}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.86\textwidth]{p3_fig3.pdf}
+  \caption{2025-09-23 主方案 B1 的日内调度：(a)~实测净负载、0:00 计划合同与实际交付合同；(b)~储能电量轨迹；(c)~日内合同调整量与紧急购电量}
+  \label{fig:q3-day}
+\end{figure}
+
+以 2025-09-23 为例（图~\ref{fig:q3-day}）：0:00 计划的合同 $b^{\mathrm{plan}}$（图中浅色实线）与实际交付合同 $b$（虚线）在夜间与清晨几乎重合，主要调整发生在 12:00 时刻——该次求解把午后部分区间的合同\textbf{下调}（图~\ref{fig:q3-day}c 中 12 时附近的负向柱），下调部分只需按 $0.5p$ 支付违约费；20:00 前后晚峰光伏退出、净负载抬升，合同被\textbf{上调}并伴生紧急购电（图中橙色柱）。储能轨迹仍保持``白天光伏充沛时充电、晚峰放电''的日循环，日末储电量与日初衔接，与问题二同期的运行形态一致。
+
+\subsection{其他时刻预报的引入必要性}
+\label{sec:q3-other}
+
+这是题面明确要求回答的问题。本节考察两种``把 6:00/12:00/18:00 预报真正用起来''的做法：
+
+\begin{itemize}
+  \item \textbf{全融合（B3）}：每个调整时刻 $\tau$ 都用当期附件 3 预报重估剩余时段的净负载，即把式~\eqref{eq:q3-fuse} 从``仅 0:00 通道''推广到``当期通道''；
+  \item \textbf{门控（G）}：承认``用不用''本身是一个决策，在每个决策点用纯因果的历史回放，从融合强度 $\lambda\in\{0,\tfrac14,\tfrac12,1\}$ 中择一（$\lambda=0$ 即退回 B1）。
+\end{itemize}
+
+\subsubsection{预报精度的改善}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{p3_fig2.pdf}
+  \caption{(a)~白天剩余时域中心预测 MAE（kWh/10\,min 区间）；(b)~全融合 B3 相对 B1 的费用瀑布}
+  \label{fig:q3-mae}
+\end{figure}
+
+图~\ref{fig:q3-mae}a 给出白天剩余时域的中心预测平均绝对误差：全融合 B3 在 6:00 与 12:00 两个发布时刻将 MAE 由 54.34、51.04 降至 50.02、46.24，降幅分别为 4.32 与 4.80；18:00 时刻略升 0.10（28.93 $\to$ 29.03），原因是该时刻距当日光伏结束已近，可改进的时域很短。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{p3_fig5.pdf}
+  \caption{光伏区间电量 MAE：预报来源（历史预报／附件 3 预报）与端点锚定方式（历史锚点／实测锚点）的四种组合，(a)~发布后首小时；(b)~首小时之后}
+  \label{fig:q3-pv}
+\end{figure}
+
+图~\ref{fig:q3-pv} 进一步在光伏区间电量本身上作四项对照。附件 3 预报叠加实测锚点的组合在两个时段上整体误差最低，且改进集中在\textbf{发布后首小时}（图~\ref{fig:q3-pv}a）——12:00 时刻的四种组合差异最大，说明当日上午实测量已经足以校正当日的光伏形状。这为式~\eqref{eq:q3-pv} 中用实测水平锚定端点的做法提供了直接依据。
+
+\subsubsection{总费用的上升}
+
+图~\ref{fig:q3-mae}b 给出 B3 相对 B1 的费用瀑布（表~\ref{tab:q3-b3}）：最终合同费用与紧急购电费用均略有下降，但\textbf{调整附加费大幅上升}，合计总费用上升。
+
+\begin{table}[H]
+  \centering
+  \caption{全融合 B3 相对主方案 B1 的费用变化（评价期 334 天，万元）}
+  \label{tab:q3-b3}
+  \begin{tabular}{lcc}
+    \toprule
+    费用项 & 变化量 & 方向 \\
+    \midrule
+    最终合同费用 & $-2.39$ & 略降（更准的预测选中了更便宜的合同） \\
+    调整附加费 & $+13.96$ & \textbf{显著上升（主导项）} \\
+    紧急购电费 & $-1.98$ & 略降 \\
+    \midrule
+    合计 & $+9.59$ & \textbf{总费用上升} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+机制是明确的：精度更高的点预测使线性规划\textbf{更倾向于}偏离 0:00 计划而转向低价时段，而每一次偏离都需按 $0.5p$／$1.5p$ 付费；附加费的增量（13.96 万元）远大于合同费用与紧急费用节省之和（4.37 万元）。即\textbf{双向违约价将``精度更高的日前预测''转化为``更频繁的合同偏离''}。
+
+\subsubsection{逐决策点自适应门控的结果}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.96\textwidth]{p3_fig6.pdf}
+  \caption{(a)~门控 $\lambda$ 在 1002 个决策点上的选择分布；(b)~门控方案 G 相对 B1 的逐月费用差（橙色表示门控方案费用更高，蓝色表示更低）}
+  \label{fig:q3-gate}
+\end{figure}
+
+图~\ref{fig:q3-gate}a 给出门控 G 在全部 1002 个决策点（334 天 $\times$ 3 个调整时刻）上的选择分布：6:00 时刻 $\lambda=0$ 与 $\lambda=1$ 分别为 128 与 133 次，12:00 时刻为 124 与 134 次，18:00 时刻为 152 与 127 次，两个端点档位合计均占约七至八成，中间档位（$\lambda=0.25,0.5$）合计不足三成。这本身即表明：\textbf{在单一决策点层面难以判断融合是否有利}，预测精度与结算费用之间的方向并不总是一致，因此门控退化为在两个端点之间选择。
+
+其结果是门控方案全年比 B1 高 \textbf{6.08 万元}（图~\ref{fig:q3-gate}b）：11 个月中仅 12 月为负（$-0.62$ 万元），2 月与 7 月增量最大（分别为 1.60 与 1.83 万元）。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.96\textwidth]{p3_fig4.pdf}
+  \caption{(a)~B1 相对 A0 的逐月节省（合计 49.99 万元，均值 4.54 万元/月）；(b)~全融合方案费用差的分组热力图（B3 $-$ B1）}
+  \label{fig:q3-month}
+\end{figure}
+
+图~\ref{fig:q3-month}a 给出主方案 B1 相对基准 A0 的逐月节省：11 个月\textbf{全部为正}，合计 49.99 万元、均值 4.54 万元/月，其中 6 月最高（13.60 万元），与 \S\ref{sec:q2-year} 中 6 月紧急费用最集中相呼应——夏季晚峰缺口最需要日内的第二次决策。图~\ref{fig:q3-month}b 进一步按``电价组 $\times$ 时段''分解 B3 与 B1 的费用差：正值集中在 6--18 时的\textbf{中价组}（$+3.99$、$+3.44$），正是合同最可能被反复调整、违约附加费最易触发的时段；低价组与高价组多数取值接近零或为负，说明融合的代价并非均匀分布，而是集中在中间价位区间。
+
+\subsubsection{小结}
+
+在本文的结算口径与所考察的网格范围内，\textbf{不需要引入其他时刻的预报来制定调整购电策略}。附件 3 的信息\textbf{在 0:00 通道使用一次}（方案 B1，1345.71 万元）即已足够；6:00、12:00、18:00 的预报只需用于``按实测重新校正剩余时段合同''这一项工作，不必再作为新的预测输入反复重建预测。其原因不在于预报精度——附件 3 的逐时预报精度更高（图~\ref{fig:q3-mae}a、图~\ref{fig:q3-pv}）——而在于本题的双向违约价显著削弱了``预测更准''向``费用更低''的转化渠道：预测精度提高带来的合同费用与紧急费用节省（4.37 万元）不足以补偿由此增加的违约附加费（13.96 万元）。
+
+\textbf{适用范围说明。}该结论是在``偏差对 0:00 计划计量、附加费 $0.5p$/$1.5p$、紧急价 $5p$''这套结算口径下，以及本文所考察的全融合与门控两种形式下成立的。若结算口径改变（例如允许无成本无限次调整，或偏差改为对上一次合同计量），结论需要重新核验；本文不据此断言``其他时刻预报无信息价值''。

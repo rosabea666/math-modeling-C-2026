@@ -1,0 +1,11 @@
+# 操作系统 / 编辑器临时文件
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+*~
+
+# Python 临时文件
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/

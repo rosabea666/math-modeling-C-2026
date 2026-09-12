@@ -1,0 +1,13 @@
+function apply_sci_style(ax)
+%APPLY_SCI_STYLE  统一设置坐标区为 Science 期刊插图风格
+%   字号 7-8 pt（正文标签不超过 8），刻度朝外，细边框，无网格装饰。
+%   用法: apply_sci_style(gca) 或对坐标区数组逐个调用。
+for k = 1:numel(ax)
+    a = ax(k);
+    set(a, 'FontName', 'Arial', 'FontSize', 7, ...
+        'LineWidth', 0.6, 'TickDir', 'out', 'TickLength', [0.015 0.015], ...
+        'Box', 'on', 'Layer', 'top', ...
+        'XGrid', 'off', 'YGrid', 'off', ...
+        'LabelFontSizeMultiplier', 8/7);   % 轴标签 8 pt
+end
+end

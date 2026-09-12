@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "created_at_utc": "2026-09-10T12:29:15.637355+00:00",
+  "random_seed": 0,
+  "input_files": [
+    {
+      "path": "C:\\Users\\fzz17\\WorkBuddy\\2026-09-10-18-17-23\\data\\附件1.xlsx",
+      "sha256": "66b87134f5ecccd68184d3539bb1293ef039f9e0fdd955a589b9bfa7f227c377",
+      "bytes": 16003
+    },
+    {
+      "path": "C:\\Users\\fzz17\\WorkBuddy\\2026-09-10-18-17-23\\data\\附件2.xlsx",
+      "sha256": "2e95fd446bfafa0d8c59577b5c2e2ea8b3f1def20dde54a3062556f4da9b4c72",
+      "bytes": 907128
+    },
+    {
+      "path": "C:\\Users\\fzz17\\WorkBuddy\\2026-09-10-18-17-23\\data\\附件5\\result1.xlsx",
+      "sha256": "28360e0974e7d6065394a8aba4e14a86773ae0036cc7d3ea1b211b515b03d688",
+      "bytes": 13323
+    },
+    {
+      "path": "C:\\Users\\fzz17\\WorkBuddy\\2026-09-10-18-17-23\\data\\附件5\\result2.xlsx",
+      "sha256": "1c26494cfc6d754e0bd9bff7e13e1126a73d2d2da6c5336eb251d89b9a1a1a47",
+      "bytes": 18397
+    }
+  ],
+  "runtime": {
+    "name": "python",
+    "version": "3.13.12",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "dependencies": {
+      "pandas": "3.0.5",
+      "scipy": "1.18.1",
+      "matplotlib": "3.11.1",
+      "openpyxl": "3.x",
+      "numpy": "2.x"
+    }
+  },
+  "key_parameters": {
+    "eta": 0.9,
+    "E_min": 1200,
+    "E_max": 10800,
+    "P_max_kW": 5000,
+    "E_init": 6000,
+    "dt_h": 0.16666666666666666,
+    "T": 144,
+    "emerg_mult": 5.0,
+    "eval_start": "2025-02-01"
+  },
+  "reproduce_command": "python scripts/q1_solve.py && python scripts/q1_figures.py && python scripts/q2_solve.py && python scripts/q2_figures.py"
+}

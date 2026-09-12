@@ -1,0 +1,91 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} 问题一核心程序：确定性单日储能经济调度 LP 的装配、求解与独立复核}
+\PYG{c+c1}{\PYGZsh{} 摘自 问题一/算法/q1\PYGZus{}solve.py（完整可运行源程序见支撑材料）}
+\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{numpy}\PYG{+w}{ }\PYG{k}{as}\PYG{+w}{ }\PYG{n+nn}{np}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{scipy.optimize}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{linprog}
+\PYG{k+kn}{from}\PYG{+w}{ }\PYG{n+nn}{scipy.sparse}\PYG{+w}{ }\PYG{k+kn}{import} \PYG{n}{csr\PYGZus{}matrix}\PYG{p}{,} \PYG{n}{lil\PYGZus{}matrix}
+
+\PYG{n}{T}\PYG{p}{,} \PYG{n}{DT} \PYG{o}{=} \PYG{l+m+mi}{144}\PYG{p}{,} \PYG{l+m+mf}{1.0} \PYG{o}{/} \PYG{l+m+mf}{6.0}
+\PYG{n}{ETA\PYGZus{}C} \PYG{o}{=} \PYG{n}{ETA\PYGZus{}D} \PYG{o}{=} \PYG{l+m+mf}{0.9}
+\PYG{n}{E\PYGZus{}MIN}\PYG{p}{,} \PYG{n}{E\PYGZus{}MAX} \PYG{o}{=} \PYG{l+m+mf}{1200.0}\PYG{p}{,} \PYG{l+m+mf}{10800.0}
+\PYG{n}{P\PYGZus{}MAX} \PYG{o}{=} \PYG{l+m+mf}{5000.0} \PYG{o}{*} \PYG{n}{DT}
+\PYG{n}{E0} \PYG{o}{=} \PYG{l+m+mf}{6000.0}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{solve\PYGZus{}q1}\PYG{p}{(}\PYG{n}{price}\PYG{p}{,} \PYG{n}{L}\PYG{p}{,} \PYG{n}{V}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}L, V: kWh/区间。返回最优解字典。\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{c+c1}{\PYGZsh{} 变量布局: g[0:T], c[0:T], d[0:T], w[0:T], E[0:T+1]}
+    \PYG{n}{n} \PYG{o}{=} \PYG{l+m+mi}{4} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+} \PYG{p}{(}\PYG{n}{T} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{n}{ig}\PYG{p}{,} \PYG{n}{ic}\PYG{p}{,} \PYG{n}{id\PYGZus{}}\PYG{p}{,} \PYG{n}{iw}\PYG{p}{,} \PYG{n}{iE} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{T}\PYG{p}{,} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{T}\PYG{p}{,} \PYG{l+m+mi}{3} \PYG{o}{*} \PYG{n}{T}\PYG{p}{,} \PYG{l+m+mi}{4} \PYG{o}{*} \PYG{n}{T}
+
+    \PYG{n}{cobj} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}
+    \PYG{n}{cobj}\PYG{p}{[}\PYG{n}{ig}\PYG{p}{:}\PYG{n}{ig} \PYG{o}{+} \PYG{n}{T}\PYG{p}{]} \PYG{o}{=} \PYG{n}{price}
+
+    \PYG{c+c1}{\PYGZsh{} 等式：SOC递推 T 行 + 能量平衡 T 行 + E\PYGZus{}0=6000 + E\PYGZus{}144=6000}
+    \PYG{n}{Aeq} \PYG{o}{=} \PYG{n}{lil\PYGZus{}matrix}\PYG{p}{((}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{n}{n}\PYG{p}{))}
+    \PYG{n}{beq} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+} \PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{t} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{T}\PYG{p}{):}
+        \PYG{n}{r} \PYG{o}{=} \PYG{n}{t}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r}\PYG{p}{,} \PYG{n}{iE} \PYG{o}{+} \PYG{n}{t} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mf}{1.0}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r}\PYG{p}{,} \PYG{n}{iE} \PYG{o}{+} \PYG{n}{t}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r}\PYG{p}{,} \PYG{n}{ic} \PYG{o}{+} \PYG{n}{t}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{ETA\PYGZus{}C}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r}\PYG{p}{,} \PYG{n}{id\PYGZus{}} \PYG{o}{+} \PYG{n}{t}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mf}{1.0} \PYG{o}{/} \PYG{n}{ETA\PYGZus{}D}
+        \PYG{n}{r2} \PYG{o}{=} \PYG{n}{T} \PYG{o}{+} \PYG{n}{t}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r2}\PYG{p}{,} \PYG{n}{ig} \PYG{o}{+} \PYG{n}{t}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mf}{1.0}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r2}\PYG{p}{,} \PYG{n}{id\PYGZus{}} \PYG{o}{+} \PYG{n}{t}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mf}{1.0}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r2}\PYG{p}{,} \PYG{n}{ic} \PYG{o}{+} \PYG{n}{t}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}
+        \PYG{n}{Aeq}\PYG{p}{[}\PYG{n}{r2}\PYG{p}{,} \PYG{n}{iw} \PYG{o}{+} \PYG{n}{t}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}
+        \PYG{n}{beq}\PYG{p}{[}\PYG{n}{r2}\PYG{p}{]} \PYG{o}{=} \PYG{n}{L}\PYG{p}{[}\PYG{n}{t}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{V}\PYG{p}{[}\PYG{n}{t}\PYG{p}{]}
+    \PYG{n}{Aeq}\PYG{p}{[}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{T}\PYG{p}{,} \PYG{n}{iE}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mf}{1.0}
+    \PYG{n}{beq}\PYG{p}{[}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{T}\PYG{p}{]} \PYG{o}{=} \PYG{n}{E0}
+    \PYG{n}{Aeq}\PYG{p}{[}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{n}{iE} \PYG{o}{+} \PYG{n}{T}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mf}{1.0}
+    \PYG{n}{beq}\PYG{p}{[}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{n}{E0}
+
+    \PYG{n}{bounds} \PYG{o}{=} \PYG{p}{(}
+        \PYG{p}{[(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{k+kc}{None}\PYG{p}{)]} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+}                    \PYG{c+c1}{\PYGZsh{} g}
+        \PYG{p}{[(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{n}{P\PYGZus{}MAX}\PYG{p}{)]} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+}                   \PYG{c+c1}{\PYGZsh{} c}
+        \PYG{p}{[(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{n}{P\PYGZus{}MAX}\PYG{p}{)]} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+}                   \PYG{c+c1}{\PYGZsh{} d}
+        \PYG{p}{[(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{k+kc}{None}\PYG{p}{)]} \PYG{o}{*} \PYG{n}{T} \PYG{o}{+}                    \PYG{c+c1}{\PYGZsh{} w}
+        \PYG{p}{[(}\PYG{n}{E\PYGZus{}MIN}\PYG{p}{,} \PYG{n}{E\PYGZus{}MAX}\PYG{p}{)]} \PYG{o}{*} \PYG{p}{(}\PYG{n}{T} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{)}             \PYG{c+c1}{\PYGZsh{} E}
+    \PYG{p}{)}
+
+    \PYG{n}{res} \PYG{o}{=} \PYG{n}{linprog}\PYG{p}{(}\PYG{n}{cobj}\PYG{p}{,} \PYG{n}{A\PYGZus{}eq}\PYG{o}{=}\PYG{n}{csr\PYGZus{}matrix}\PYG{p}{(}\PYG{n}{Aeq}\PYG{p}{),} \PYG{n}{b\PYGZus{}eq}\PYG{o}{=}\PYG{n}{beq}\PYG{p}{,} \PYG{n}{bounds}\PYG{o}{=}\PYG{n}{bounds}\PYG{p}{,} \PYG{n}{method}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}highs\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{assert} \PYG{n}{res}\PYG{o}{.}\PYG{n}{status} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}LP未收敛: status=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{res}\PYG{o}{.}\PYG{n}{status}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{res}\PYG{o}{.}\PYG{n}{message}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{res}\PYG{o}{.}\PYG{n}{x}
+    \PYG{k}{return} \PYG{p}{\PYGZob{}}
+        \PYG{l+s+s2}{\PYGZdq{}g\PYGZdq{}}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{n}{ig}\PYG{p}{:}\PYG{n}{ig} \PYG{o}{+} \PYG{n}{T}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}c\PYGZdq{}}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{n}{ic}\PYG{p}{:}\PYG{n}{ic} \PYG{o}{+} \PYG{n}{T}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}d\PYGZdq{}}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{n}{id\PYGZus{}}\PYG{p}{:}\PYG{n}{id\PYGZus{}} \PYG{o}{+} \PYG{n}{T}\PYG{p}{],}
+        \PYG{l+s+s2}{\PYGZdq{}w\PYGZdq{}}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{n}{iw}\PYG{p}{:}\PYG{n}{iw} \PYG{o}{+} \PYG{n}{T}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}E\PYGZdq{}}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{n}{iE}\PYG{p}{:}\PYG{n}{iE} \PYG{o}{+} \PYG{n}{T} \PYG{o}{+} \PYG{l+m+mi}{1}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}cost\PYGZdq{}}\PYG{p}{:} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{res}\PYG{o}{.}\PYG{n}{fun}\PYG{p}{),}
+        \PYG{l+s+s2}{\PYGZdq{}solver\PYGZus{}msg\PYGZdq{}}\PYG{p}{:} \PYG{n}{res}\PYG{o}{.}\PYG{n}{message}\PYG{p}{,}
+    \PYG{p}{\PYGZcb{}}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{validate}\PYG{p}{(}\PYG{n}{sol}\PYG{p}{,} \PYG{n}{price}\PYG{p}{,} \PYG{n}{L}\PYG{p}{,} \PYG{n}{V}\PYG{p}{):}
+\PYG{+w}{    }\PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}独立复核：能量守恒、SOC边界、日循环、功率上限、互斥、费用复算\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{g}\PYG{p}{,} \PYG{n}{c}\PYG{p}{,} \PYG{n}{d}\PYG{p}{,} \PYG{n}{w}\PYG{p}{,} \PYG{n}{E} \PYG{o}{=} \PYG{n}{sol}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}g\PYGZdq{}}\PYG{p}{],} \PYG{n}{sol}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}c\PYGZdq{}}\PYG{p}{],} \PYG{n}{sol}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}d\PYGZdq{}}\PYG{p}{],} \PYG{n}{sol}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}w\PYGZdq{}}\PYG{p}{],} \PYG{n}{sol}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}E\PYGZdq{}}\PYG{p}{]}
+    \PYG{n}{checks} \PYG{o}{=} \PYG{p}{\PYGZob{}\PYGZcb{}}
+    \PYG{n}{bal} \PYG{o}{=} \PYG{n}{g} \PYG{o}{+} \PYG{n}{V} \PYG{o}{+} \PYG{n}{d} \PYG{o}{\PYGZhy{}} \PYG{n}{L} \PYG{o}{\PYGZhy{}} \PYG{n}{c} \PYG{o}{\PYGZhy{}} \PYG{n}{w}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}能量平衡最大残差(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{bal}\PYG{p}{)))}
+    \PYG{n}{soc\PYGZus{}res} \PYG{o}{=} \PYG{n}{E}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:]} \PYG{o}{\PYGZhy{}} \PYG{n}{E}\PYG{p}{[:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{ETA\PYGZus{}C} \PYG{o}{*} \PYG{n}{c} \PYG{o}{+} \PYG{n}{d} \PYG{o}{/} \PYG{n}{ETA\PYGZus{}D}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}SOC递推最大残差(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{soc\PYGZus{}res}\PYG{p}{)))}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}E最小值(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{E}\PYG{o}{.}\PYG{n}{min}\PYG{p}{())}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}E最大值(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{E}\PYG{o}{.}\PYG{n}{max}\PYG{p}{())}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}E0(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{E}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}E144(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{E}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}充电功率上限越界\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{n}{c}\PYG{o}{.}\PYG{n}{max}\PYG{p}{()} \PYG{o}{\PYGZhy{}} \PYG{n}{P\PYGZus{}MAX}\PYG{p}{))}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}放电功率上限越界\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mf}{0.0}\PYG{p}{,} \PYG{n}{d}\PYG{o}{.}\PYG{n}{max}\PYG{p}{()} \PYG{o}{\PYGZhy{}} \PYG{n}{P\PYGZus{}MAX}\PYG{p}{))}
+    \PYG{n}{both} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{minimum}\PYG{p}{(}\PYG{n}{c}\PYG{p}{,} \PYG{n}{d}\PYG{p}{)}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}同时充放电最大重叠(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{both}\PYG{o}{.}\PYG{n}{max}\PYG{p}{())}
+    \PYG{n}{cost\PYGZus{}recalc} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{dot}\PYG{p}{(}\PYG{n}{price}\PYG{p}{,} \PYG{n}{g}\PYG{p}{))}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}费用复算(元)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n}{cost\PYGZus{}recalc}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}费用与求解器差(元)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{cost\PYGZus{}recalc} \PYG{o}{\PYGZhy{}} \PYG{n}{sol}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}cost\PYGZdq{}}\PYG{p}{])}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}购电总量(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{g}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{())}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}充电总量(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{c}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{())}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}放电总量(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{d}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{())}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}余量总量(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{w}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{())}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}负载总量(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{L}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{())}
+    \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}光伏总量(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{n}{V}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{())}
+    \PYG{n}{ok} \PYG{o}{=} \PYG{p}{(}\PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}能量平衡最大残差(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{1e\PYGZhy{}6} \PYG{o+ow}{and} \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}SOC递推最大残差(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{1e\PYGZhy{}6}
+          \PYG{o+ow}{and} \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}E最小值(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}=} \PYG{n}{E\PYGZus{}MIN} \PYG{o}{\PYGZhy{}} \PYG{n}{TOL} \PYG{o+ow}{and} \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}E最大值(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}=} \PYG{n}{E\PYGZus{}MAX} \PYG{o}{+} \PYG{n}{TOL}
+          \PYG{o+ow}{and} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{E}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{E0}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{n}{TOL} \PYG{o+ow}{and} \PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{E}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{E0}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{n}{TOL}
+          \PYG{o+ow}{and} \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}同时充放电最大重叠(kWh)\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{1e\PYGZhy{}6}
+          \PYG{o+ow}{and} \PYG{n}{checks}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}费用与求解器差(元)\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{1e\PYGZhy{}4}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{checks}\PYG{p}{,} \PYG{n}{ok}
+\end{MintedVerbatim}

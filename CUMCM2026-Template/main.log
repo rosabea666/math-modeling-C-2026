@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.9.7)  13 SEP 2026 11:29
+This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex 2026.9.12)  13 SEP 2026 11:57
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1116,86 +1116,87 @@ Package fontspec Info:
 ]
 File: figures/p1_fig1.pdf Graphic file (type pdf)
 <use figures/p1_fig1.pdf>
- [4] [5]
-[6]) (./sections/03-assumptions.tex [7]) (./sections/04-problem1.tex [8]
+ [4] [5])
+(./sections/03-assumptions.tex [6] [7]) (./sections/04-problem1.tex [8]
 [9] [10]
 File: figures/p1_fig2.pdf Graphic file (type pdf)
 <use figures/p1_fig2.pdf>
- [11] [12]
+ [11]
 File: figures/p1_fig3.pdf Graphic file (type pdf)
 <use figures/p1_fig3.pdf>
-) (./sections/05-problem2-model.tex
+) (./sections/05-problem2-model.tex [12]
 File: figures/p2_fig1.pdf Graphic file (type pdf)
 <use figures/p2_fig1.pdf>
- [13] [14]
+ [13]
 File: figures/p2_fig2.pdf Graphic file (type pdf)
 <use figures/p2_fig2.pdf>
- [15] [16])
-(./sections/06-problem2-results.tex [17]
+ [14] [15] [16])
+(./sections/06-problem2-results.tex
 File: figures/p2_fig3.pdf Graphic file (type pdf)
 <use figures/p2_fig3.pdf>
- [18] [19] [20]
+ [17] [18] [19]
 File: figures/p2_fig4.pdf Graphic file (type pdf)
 <use figures/p2_fig4.pdf>
- [21]
+ [20]
 File: figures/p2_fig5.pdf Graphic file (type pdf)
 <use figures/p2_fig5.pdf>
- [22]
+ [21]
 File: figures/p2_fig6.pdf Graphic file (type pdf)
 <use figures/p2_fig6.pdf>
- [23]
+ [22]
 File: figures/p2_fig7.pdf Graphic file (type pdf)
 <use figures/p2_fig7.pdf>
- [24])
-(./sections/07-problem3.tex [25] [26]
+ [23])
+(./sections/07-problem3.tex [24] [25] [26]
 File: figures/p3_fig1.pdf Graphic file (type pdf)
 <use figures/p3_fig1.pdf>
- [27]
+ [27] [28] [29]
 File: figures/p3_fig3.pdf Graphic file (type pdf)
 <use figures/p3_fig3.pdf>
- [28] [29]
+ [30]
 File: figures/p3_fig2.pdf Graphic file (type pdf)
 <use figures/p3_fig2.pdf>
 File: figures/p3_fig5.pdf Graphic file (type pdf)
 <use figures/p3_fig5.pdf>
- [30]
+ [31]
 File: figures/p3_fig6.pdf Graphic file (type pdf)
 <use figures/p3_fig6.pdf>
+ [32]
 File: figures/p3_fig4.pdf Graphic file (type pdf)
 <use figures/p3_fig4.pdf>
- [31] [32])
-(./sections/08-problem4.tex [33]
+)
+(./sections/08-problem4.tex [33] [34]
 File: figures/p4_fig1.pdf Graphic file (type pdf)
 <use figures/p4_fig1.pdf>
- [34] [35] [36] [37] [38]
+ [35] [36] [37] [38]
 File: figures/p4_fig3.pdf Graphic file (type pdf)
 <use figures/p4_fig3.pdf>
- [39]
+ [39] [40]
 File: figures/p4_fig2.pdf Graphic file (type pdf)
 <use figures/p4_fig2.pdf>
- [40] [41]
+ [41]
 [42]
 File: figures/p4_fig4.pdf Graphic file (type pdf)
 <use figures/p4_fig4.pdf>
- [43] [44]) (./sections/09-evaluation.tex [45]) [46]
-(./backmatter/references.tex) (./backmatter/appendix.tex [47
+ [43] [44]) (./sections/09-evaluation.tex [45] [46]) [47]
+(./backmatter/references.tex) (./backmatter/appendix.tex [48
 
-] [48] [49]
-[50] [51] [52] [53]) [54] (./main.aux)
+] [49] [50]
+[51] [52] [53] [54]) [55] (./main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2022/08/05>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 7F26D3EE327A15599459B68E1DA73A6C;10656.
+(rerunfilecheck)             Checksum: 032EB80EF195D7AE6709D679F3B3EC82;10693.
  ) 
 Here is how much of TeX's memory you used:
- 22111 strings out of 468168
- 484749 string characters out of 5436525
- 912121 words of memory out of 5000000
- 50432 multiletter control sequences out of 15000+600000
+ 22118 strings out of 468168
+ 484844 string characters out of 5436524
+ 912540 words of memory out of 5000000
+ 50439 multiletter control sequences out of 15000+600000
  639208 words of font info for 136 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  93i,13n,111p,1221b,599s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.xdv (54 pages, 802216 bytes).
+Output written on main.xdv (55 pages, 836460 bytes).

@@ -37,9 +37,18 @@
 - **表格排版坑（Q4 新增，两次踩）**：中文长单元格**不要**用固定列宽的 `tabular`（会 Overfull 或 Underfull badness 10000）；一律用 `\begin{tabularx}{\textwidth}{lXcc}` 让文字列走 `X`。列数多（≥4 个中文列）时用 `\footnotesize` + `clXX` 紧凑版，否则触发 "Float too large for page"。
 - **符号表已按问题拆分**：`tab:sym-common`（问题一至三）与 `tab:sym-q34`（问题三预报通道＋问题四实时电价）。加符号先判断归哪张，别塞回单张表（会 Float too large）。
 - **裁白边**：这些 matplotlib PDF 是整幅 A4 页，内容只占中间一块。必须用 PyMuPDF 取 drawings+text+image 的并集外接框 `set_cropbox()` 再存，否则图和页面都会大片留白。
-- **版式纪律**：`[H]` 浮动体放不下会把整页剩余留白（曾出现整页空白）→ 图/表一律 `[htbp]`。编译后用 pdftotext 按 `\f` 切页扫"稀疏页"（每页 <500 字符即人工复核）。
+- **版式纪律**：高表（二十余行）用 `[H]` 反而更干净——`[htbp]` 会把它甩成**居中浮动页**（上下各留大片空白）并可能挤出一张**只剩一行正文**的页；`[H]` 牺牲的是表前那页的底部余白。矮表仍用 `[htbp]`。放宽 `\topfraction` 等参数（0.92/0.85/0.06/0.88）**试过无效且引入 Overfull**，已回退，别再加。编译后用 pdftotext / PyMuPDF 按页扫"稀疏页"（每页 <500 字符即人工复核，注意含矢量图的图页也会被判稀疏，需看 drawings 数）。
 - **中文字体缺字**：带圈数字 ①②③、希腊 β 等会被 xeCJK 判为西文而显示空白，导言区加 `\xeCJKDeclareCharClass{CJK}{"2460 -> "2473, "0370 -> "03FF}`。
-- 论文现状：**问题一至问题四全部成文**（53 页，0 warning / 0 undefined / 0 overfull / 0 underfull / 0 missing char）。
+- 论文现状：**问题一至问题四全部成文**（54 页，0 warning / 0 undefined / 0 overfull / 0 underfull / 0 missing char）。5 张答案表已换成题目原表样式（见下节）。
+
+## 答案表样式（2026-09-13，按 `D:\09_Temp\C题_表格汇总.tex` 对齐）
+- 范围：**仅 5 张"对应题目表 N"的答案表** —— `tab:q1-t1`（表3）、`tab:q1-t2`（表4）、`tab:q2-t1`（表8）、`tab:q2-t2`（表9）、`tab:q2-t3`（表10），位于 `sections/04-problem1.tex` 与 `sections/06-problem2-results.tex`。**正文一字未改**（已用"旧 PDF 全部 ≥25 字符长行去空白后在新 PDF 中查找，0 缺失"验证）。
+- 题目原表样式 = `|c|c|...|` 全框线 + 全 `\hline`（**不用 booktabs**）；行排布照抄：
+  - 表1：`时间段|购电量`×3 并排 → 两行时段（10/12/14、16/18/20）→ 末行「全天购电量｜值｜全天购电费｜值」（标签 `\multicolumn{2}{|c|}{…}`，值放下一列）。
+  - 表2：`时间段|充电量|放电量`×2 → 三行时段 → 末行「0:00 储电量｜值｜24:00 储电量｜值」。
+  - 表3：4 个日期组「时间段|购电量」×4 并排 + `\multicolumn{2}` 日期表头 + 3 行数据。
+- **Q2 四个指定日期**：按题面"按表 1/表 2/表 3 的格式给出"改为**每日期一块、纵向堆叠**（表8 21 行、表9 17 行），日期用 `\multicolumn{6}{|c|}{2025-03-20}` 表头行分隔；结论：表8/表9/表10 用 `[H]`，`\small`+`tabcolsep 4pt`（表10 用 `\footnotesize`+`3pt`+`\resizebox`，表头 `\shortstack{紧急购电量\\(kWh)}` 压列宽）。
+- 备份：`_refactor_backup/{04-problem1.tex,06-problem2-results.tex,main.pdf}.0913-1122.bak`。`sections/` 中已无 `\multirow` 使用。
 
 ## 问题四（Q4）资产与口径
 - 初稿引用的 `scripts/q4_model_v3.py`、`scripts/q4_check_v3.py` 本机不存在；`results/q4_v3/F_pt.csv` 已由 `scripts/q4_export_pt.py` 重建（365×144，评价期均值 374.31 kWh/区间）。

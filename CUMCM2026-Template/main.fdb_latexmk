@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1789232890.55867 "main.xdv" "main.pdf" "main" 1789232892.01947 0
-  "main.xdv" 1789232890 788084 8cf2a57fcb327a4904c21399830e410c "xelatex"
+["xdvipdfmx"] 1789270149.41816 "main.xdv" "main.pdf" "main" 1789270151.34723 0
+  "main.xdv" 1789270148 802216 ab608c653833ab16592332040db147a0 "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1789232887.65062 "main.tex" "main.xdv" "main" 1789232892.0079 0
+["xelatex"] 1789270145.00226 "main.tex" "main.xdv" "main" 1789270151.32523 0
   "backmatter/appendix.tex" 1789232865 4001 e8a8a983a899a7a9d455571e78944eb7 ""
   "backmatter/references.tex" 1789219586 876 9f93ace3d6ac722c3fc73faeae2b60c9 ""
   "c:/Windows/Fonts/msyh.ttc" 1780715526 19704352 1e10e74402e59d54499af795caf0b135 ""
@@ -154,21 +154,21 @@
   "figures/p4_fig2.pdf" 1789232281 74755 316de3493c01331fc25d39cb4d5fc076 ""
   "figures/p4_fig3.pdf" 1789232281 67846 c54466295000992893ffe5951aef1e94 ""
   "figures/p4_fig4.pdf" 1789232281 72779 46638d66918a710d3fa1f7dccd582f1c ""
-  "main.aux" 1789232890 32090 de987a16729dd71be58e023eeb420d4c "xelatex"
-  "main.out" 1789232890 10656 7f26d3ee327a15599459b68e1da73a6c "xelatex"
-  "main.tex" 1789227690 2794 bf5742960d9b416600979bdb135f670d ""
+  "main.aux" 1789270148 32090 9ec1a6688104d104a9d8481186f8ba88 "xelatex"
+  "main.out" 1789270148 10656 7f26d3ee327a15599459b68e1da73a6c "xelatex"
+  "main.tex" 1789267203 2794 bf5742960d9b416600979bdb135f670d ""
   "preamble/fonts.tex" 1789219559 1024 3d98ed2589588dfb3cfbb1b109b9ec0d ""
-  "preamble/layout.tex" 1789219566 751 9685c58c38b3ec42d3afad8d97597377 ""
+  "preamble/layout.tex" 1789270131 751 9685c58c38b3ec42d3afad8d97597377 ""
   "preamble/packages.tex" 1789219641 956 903ab1c8c1692c3aa5f2560547d09381 ""
-  "sections/00-abstract.tex" 1789231793 5430 5c9c585e797c69ddd5e32c7f9b84cc8d ""
+  "sections/00-abstract.tex" 1789267219 5430 5c9c585e797c69ddd5e32c7f9b84cc8d ""
   "sections/01-restatement.tex" 1789227649 3615 717df094bbd8b43c4dde134f944e41e1 ""
   "sections/02-analysis.tex" 1789227661 8818 326c8cdf0a735135f9701962f14057ef ""
   "sections/03-assumptions.tex" 1789227781 7085 642c1b50242e9d25fb416e0031605fa2 ""
-  "sections/04-problem1.tex" 1789220326 8605 672c2a2094cdcf0f2d48e3c41f70ef34 ""
+  "sections/04-problem1.tex" 1789269788 8702 27f4f38677abe3cbb32d6fd32e9ac4d8 ""
   "sections/05-problem2-model.tex" 1789220406 11243 f6c64b84ce1b34cd4417cff5ca5b443e ""
-  "sections/06-problem2-results.tex" 1789220491 11632 95ca9547c6431011c59f4e099df9d1ee ""
+  "sections/06-problem2-results.tex" 1789270139 14279 44b9294d991935d9bbb0140557febc95 ""
   "sections/07-problem3.tex" 1789220520 15958 4681414c43830cd2f2dfb4136ff8748e ""
-  "sections/08-problem4.tex" 1789232876 33499 dbb7691a08516d00a657cc1a65dd8578 ""
+  "sections/08-problem4.tex" 1789233278 33492 9fe282894c7aa2f481216fac92eef8b5 ""
   "sections/09-evaluation.tex" 1789227700 4627 8c7ab3dd20a7d3d599b5bfee45812636 ""
   (generated)
   "main.aux"

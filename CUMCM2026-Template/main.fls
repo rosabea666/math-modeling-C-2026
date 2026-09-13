@@ -313,6 +313,12 @@ INPUT ./sections/06-problem2-results.tex
 INPUT sections/06-problem2-results.tex
 INPUT ./figures/p2_fig3.pdf
 INPUT ./figures/p2_fig3.pdf
+INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmmi9.tfm
+INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmsy9.tfm
+INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex9.tfm
+INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
+INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
+INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmr9.tfm
 INPUT ./figures/p2_fig4.pdf
 INPUT ./figures/p2_fig4.pdf
 INPUT ./figures/p2_fig5.pdf
@@ -343,12 +349,6 @@ INPUT ./sections/08-problem4.tex
 INPUT ./sections/08-problem4.tex
 INPUT ./sections/08-problem4.tex
 INPUT sections/08-problem4.tex
-INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmmi9.tfm
-INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmsy9.tfm
-INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex9.tfm
-INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
-INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm10.tfm
-INPUT c:/texlive/2026/texmf-dist/fonts/tfm/public/cm/cmr9.tfm
 INPUT ./figures/p4_fig1.pdf
 INPUT ./figures/p4_fig1.pdf
 INPUT ./figures/p4_fig3.pdf

@@ -8,8 +8,10 @@
   \item \texttt{data/附件1.xlsx}：代表日电价、小区负载与光伏预测功率（题面附件 1）；
   \item \texttt{data/附件2.xlsx}：2025 年逐日实测负载与光伏功率（题面附件 2）；
   \item \texttt{data/附件3.xlsx}：2025 年逐日 0:00、6:00、12:00、18:00 发布的未来 24 小时整点光伏功率预报（题面附件 3）；
+  \item \texttt{data/附件4.xlsx}：2025 年逐日逐 10 分钟区间实时电价（题面附件 4）；
   \item \texttt{results/result1.xlsx}：问题一提交结果（计划购电量、充放电量两个工作表）；
   \item \texttt{results/result2.xlsx}：问题二提交结果（计划购电量、充放电量、紧急购电量三个工作表，覆盖 2025.2.1--12.31）；
+  \item \texttt{results/result3.xlsx}：问题三提交结果（计划购电量、调整购电量、充放电量、紧急购电量四个工作表，覆盖 2025.2.1--12.31）；
   \item \texttt{问题四/result4-2.xlsx}：问题四 Q2 分支提交结果（实时电价下重算问题二）；
   \item \texttt{问题四/result4-3.xlsx}：问题四 Q3 分支提交结果（实时电价下重算问题三，另含调整购电量工作表）；
   \item \texttt{问题一/算法/q1\_solve.py}：问题一主程序（线性规划装配、求解、独立校验、写表）；
@@ -28,7 +30,7 @@
 
 \section{核心程序}
 
-以下为核心函数节选；完整可运行源程序随支撑材料提交。问题一与问题二的全部结果分别可由 \texttt{q1\_solve.py} 与 \texttt{q2\_main\_algorithm.py} 一条命令复现。问题三的预报融合、调整层与执行段核心函数见支撑材料 \texttt{问题三/代码/}；问题四的 48 小时滚动时域与执行结算函数见下节。
+以下为核心函数节选；完整可运行源程序随支撑材料提交。问题一与问题二的全部结果分别可由 \texttt{q1\_solve.py} 与 \texttt{q2\_main\_algorithm.py} 一条命令复现。问题三的预报融合、调整层与执行段核心函数见 \S\ref{app:q3-code}，全年回放入口见支撑材料 \texttt{问题三/代码/}；问题四的 48 小时滚动时域与执行结算函数见 \S\ref{app:q4-code}。
 
 \subsection{问题一：线性规划装配、求解与独立复核}
 \label{app:q1-code}
@@ -39,6 +41,11 @@
 \label{app:q2-code}
 
 \VerbatimInput[frame=single,numbers=left,fontsize=\scriptsize,label=\texttt{code/q2\_core.py}]{code/q2_core.py}
+
+\subsection{问题三：预报融合、调整层与执行段核心代码}
+\label{app:q3-code}
+
+\VerbatimInput[frame=single,numbers=left,fontsize=\scriptsize,label=\texttt{code/q3\_core.py}]{code/q3_core.py}
 
 \subsection{问题四：48 小时滚动时域计划、调整与执行核心代码}
 \label{app:q4-code}

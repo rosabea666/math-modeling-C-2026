@@ -14,12 +14,12 @@ I changed them all to CP936
 Rc files read:
   .latexmkrc
 Latexmk: This is Latexmk, John Collins, 15 June 2025. Version 4.87.
-No existing .aux file, so I'll make a simple one, and require run of *latex.
 Latexmk: applying rule 'xelatex'...
 Rule 'xelatex':  Reasons for rerun
-Category 'other':
-  Rerun of 'xelatex' forced or previously required:
-    Reason or flag: 'Initial setup'
+Changed files or newly in use/created:
+  backmatter/appendix.tex
+Category 'changed_user':
+  backmatter/appendix.tex
 
 ------------
 Run number 1 of rule 'xelatex'
@@ -135,506 +135,32 @@ For additional information on amsmath, use the `?' option.
 (./preamble/fonts.tex) (./preamble/layout.tex) (./main.aux)
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
-
-Package hyperref Warning: Rerun to get /PageLabels entry.
-
-(./sections/00-abstract.tex
+(./main.out) (./main.out) (./sections/00-abstract.tex
 (c:/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd)
-(c:/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd)
-
-LaTeX Warning: Reference `eq:q4-prm' on page 1 undefined on input line 15.
-
-[1] [2]) (./sections/01-restatement.tex) (./sections/02-analysis.tex [3]
-
-LaTeX Warning: Reference `sec:q2-frame' on page 4 undefined on input line 7.
-
-
-LaTeX Warning: Reference `sec:q3-frame' on page 4 undefined on input line 7.
-
-
-LaTeX Warning: Reference `sec:q4-model' on page 4 undefined on input line 7.
-
-
-LaTeX Warning: Reference `fig:q1-input' on page 4 undefined on input line 11.
-
-
-LaTeX Warning: Reference `sec:q1-relax' on page 4 undefined on input line 13.
-
-[4]
-
-LaTeX Warning: Reference `sec:q2-forecast' on page 5 undefined on input line 26
-.
-
-[5]
-
-LaTeX Warning: Reference `sec:q3-matrix' on page 6 undefined on input line 43.
-
-
-LaTeX Warning: Reference `sec:q4-struct' on page 6 undefined on input line 48.
-
-
-LaTeX Warning: Reference `eq:q4-prm' on page 6 undefined on input line 56.
-
-[6]
-
-LaTeX Warning: Reference `sec:q4-horizon' on page 7 undefined on input line 58.
-
-
-) (./sections/03-assumptions.tex
-
-LaTeX Warning: Reference `sec:q2-walkforward' on page 7 undefined on input line
- 15.
-
-[7]
-
-LaTeX Warning: Reference `eq:q4-decomp' on page 8 undefined on input line 33.
-
-
-LaTeX Warning: Reference `eq:q4-decomp' on page 8 undefined on input line 89.
-
-
-LaTeX Warning: Reference `eq:q4-prm' on page 8 undefined on input line 89.
-
-) (./sections/04-problem1.tex [8] [9]
-
-LaTeX Warning: Reference `eq:q1-balance' on page 10 undefined on input line 22.
-
-
-
-LaTeX Warning: Reference `eq:q1-bound' on page 10 undefined on input line 22.
-
-
-LaTeX Warning: Reference `eq:q1-cycle' on page 10 undefined on input line 22.
-
-
-LaTeX Warning: Reference `sec:q1-constraint' on page 10 undefined on input line
- 30.
-
-
-LaTeX Warning: Citation `highs' on page 10 undefined on input line 43.
-
-
-LaTeX Warning: Citation `scipy' on page 10 undefined on input line 43.
-
-
-LaTeX Warning: Reference `app:q1-code' on page 10 undefined on input line 43.
-
-[10]
-
-LaTeX Warning: Reference `fig:q1-strategy' on page 11 undefined on input line 8
-8.
-
-
-LaTeX Warning: Reference `sec:q1-sens' on page 11 undefined on input line 88.
-
-[11]
-
-LaTeX Warning: Reference `fig:q1-sens' on page 12 undefined on input line 120.
-
-
-LaTeX Warning: Reference `fig:q1-sens' on page 12 undefined on input line 120.
-
-[12]) (./sections/05-problem2-model.tex
-
-LaTeX Warning: Reference `fig:q2-frame' on page 13 undefined on input line 10.
-
-
-LaTeX Warning: Reference `sec:q2-forecast' on page 13 undefined on input line 1
-2.
-
-
-LaTeX Warning: Reference `sec:q2-lp' on page 13 undefined on input line 13.
-
-
-LaTeX Warning: Reference `sec:q2-exec' on page 13 undefined on input line 14.
-
-
-LaTeX Warning: Reference `sec:q2-exec' on page 13 undefined on input line 16.
-
-
-LaTeX Warning: Reference `app:q2-code' on page 13 undefined on input line 16.
-
-[13]
-
-LaTeX Warning: Reference `fig:q2-forecast' on page 14 undefined on input line 4
-5.
-
-
-LaTeX Warning: Reference `eq:q2-forecast' on page 14 undefined on input line 45
-.
-
-
-LaTeX Warning: Citation `newsvendor' on page 14 undefined on input line 51.
-
-
-LaTeX Warning: Reference `sec:q2-walkforward' on page 14 undefined on input lin
-e 51.
-
-[14] [15]
-
-LaTeX Warning: Reference `tab:q2-sched' on page 16 undefined on input line 78.
-
-[16]
-
-LaTeX Warning: Reference `sec:q2-walkforward' on page 17 undefined on input lin
-e 140.
-
-
-LaTeX Warning: Reference `sec:q2-forecast' on page 17 undefined on input line 1
-40.
-
-
-LaTeX Warning: Reference `sec:q2-lp' on page 17 undefined on input line 140.
-
-
-LaTeX Warning: Reference `sec:q2-exec' on page 17 undefined on input line 140.
-
-) (./sections/06-problem2-results.tex
-
-LaTeX Warning: Reference `sec:q2-total' on page 17 undefined on input line 7.
-
-
-LaTeX Warning: Reference `sec:q2-days' on page 17 undefined on input line 7.
-
-
-LaTeX Warning: Reference `sec:q2-year' on page 17 undefined on input line 7.
-
-
-LaTeX Warning: Reference `sec:q2-risk' on page 17 undefined on input line 7.
-
-
-LaTeX Warning: Reference `sec:q2-ablation' on page 17 undefined on input line 7
-.
-
-[17] [18]
-
-LaTeX Warning: Reference `eq:q2-cost' on page 19 undefined on input line 63.
-
-[19]
-
-LaTeX Warning: Reference `fig:q2-days' on page 20 undefined on input line 83.
-
-
-LaTeX Warning: Reference `fig:q2-days' on page 20 undefined on input line 106.
-
-[20] [21]
-
-LaTeX Warning: Reference `fig:q2-month' on page 22 undefined on input line 150.
-
-
-[22]
-
-LaTeX Warning: Reference `fig:q2-emerg' on page 23 undefined on input line 181.
-
-
-
-LaTeX Warning: Reference `fig:q2-year' on page 23 undefined on input line 181.
-
-
-LaTeX Warning: Reference `fig:q2-ladder' on page 23 undefined on input line 186
-.
-
-[23]
-
-LaTeX Warning: Reference `fig:q2-ladder' on page 24 undefined on input line 215
-.
-
-) (./sections/07-problem3.tex [24]
-
-LaTeX Warning: Reference `fig:q2-frame' on page 25 undefined on input line 17.
-
-
-LaTeX Warning: Reference `eq:q2-forecast' on page 25 undefined on input line 31
-.
-
-[25]
-
-LaTeX Warning: Reference `sec:q2-lp' on page 26 undefined on input line 57.
-
-
-LaTeX Warning: Reference `eq:q3-adjust' on page 26 undefined on input line 59.
-
-
-LaTeX Warning: Reference `sec:q2-exec' on page 26 undefined on input line 64.
-
-
-LaTeX Warning: Reference `sec:q2-exec' on page 26 undefined on input line 66.
-
-
-LaTeX Warning: Reference `fig:q3-matrix' on page 26 undefined on input line 71.
-
-
-
-LaTeX Warning: Reference `eq:q3-fuse' on page 26 undefined on input line 71.
-
-
-LaTeX Warning: Reference `tab:q3-matrix' on page 26 undefined on input line 96.
-
-
-
-LaTeX Warning: Reference `fig:q3-matrix' on page 26 undefined on input line 96.
-
-
-[26]
-
-LaTeX Warning: Reference `fig:q3-day' on page 27 undefined on input line 116.
-
-
-LaTeX Warning: Reference `fig:q3-day' on page 27 undefined on input line 116.
-
-[27] [28]
-
-LaTeX Warning: Reference `eq:q3-fuse' on page 29 undefined on input line 124.
-
-
-LaTeX Warning: Reference `fig:q3-mae' on page 29 undefined on input line 137.
-
-
-LaTeX Warning: Reference `fig:q3-pv' on page 29 undefined on input line 146.
-
-
-LaTeX Warning: Reference `fig:q3-pv' on page 29 undefined on input line 146.
-
-
-LaTeX Warning: Reference `eq:q3-pv' on page 29 undefined on input line 146.
-
-
-LaTeX Warning: Reference `fig:q3-mae' on page 29 undefined on input line 150.
-
-
-LaTeX Warning: Reference `tab:q3-b3' on page 29 undefined on input line 150.
-
-[29]
-
-LaTeX Warning: Reference `fig:q3-gate' on page 30 undefined on input line 180.
-
-
-LaTeX Warning: Reference `fig:q3-gate' on page 30 undefined on input line 182.
-
-
-LaTeX Warning: Reference `fig:q3-month' on page 30 undefined on input line 191.
-
-
-
-LaTeX Warning: Reference `sec:q2-year' on page 30 undefined on input line 191.
-
-
-LaTeX Warning: Reference `fig:q3-month' on page 30 undefined on input line 191.
-
-
-[30] [31]
-
-LaTeX Warning: Reference `fig:q3-mae' on page 32 undefined on input line 195.
-
-
-LaTeX Warning: Reference `fig:q3-pv' on page 32 undefined on input line 195.
-
-) (./sections/08-problem4.tex [32]
-
-LaTeX Warning: Reference `sec:q2-exec' on page 33 undefined on input line 33.
-
-[33]
-
-LaTeX Warning: Reference `tab:q4-struct' on page 34 undefined on input line 84.
-
-
-
-LaTeX Warning: Reference `sec:q4-ablation' on page 34 undefined on input line 9
-3.
-
-
-LaTeX Warning: Reference `fig:q4-struct' on page 34 undefined on input line 99.
-
-
-
-LaTeX Warning: Reference `eq:q4-decomp' on page 34 undefined on input line 104.
-
-
-[34]
-
-LaTeX Warning: Reference `eq:q4-decomp' on page 35 undefined on input line 110.
-
-
-
-LaTeX Warning: Reference `eq:q4-prefix' on page 35 undefined on input line 135.
-
-
-
-LaTeX Warning: Reference `sec:q4-ablation' on page 35 undefined on input line 1
-39.
-
-
-LaTeX Warning: Reference `eq:q2-forecast' on page 35 undefined on input line 14
-3.
-
-[35]
-
-LaTeX Warning: Reference `eq:q4-prm' on page 36 undefined on input line 153.
-
-
-LaTeX Warning: Reference `sec:q4-grid' on page 36 undefined on input line 153.
-
-
-LaTeX Warning: Reference `sec:q2-lp' on page 36 undefined on input line 158.
-
-
-LaTeX Warning: Reference `sec:q4-horizon-gain' on page 36 undefined on input li
-ne 167.
-
-
-LaTeX Warning: Reference `sec:q4-sens' on page 36 undefined on input line 167.
-
-
-LaTeX Warning: Reference `sec:q2-exec' on page 36 undefined on input line 171.
-
-[36]
-
-LaTeX Warning: Reference `app:q4-code' on page 37 undefined on input line 185.
-
-
-LaTeX Warning: Reference `tab:q4-struct' on page 37 undefined on input line 191
-.
-
-
-LaTeX Warning: Reference `sec:q4-sens' on page 37 undefined on input line 193.
-
-
-LaTeX Warning: Reference `fig:q4-regret' on page 37 undefined on input line 193
-.
-
-
-LaTeX Warning: Reference `sec:q4-limit' on page 37 undefined on input line 195.
-
-
-[37] [38]
-
-LaTeX Warning: Reference `tab:q4-horizon' on page 39 undefined on input line 24
-4.
-
-
-LaTeX Warning: Reference `fig:q4-horizon' on page 39 undefined on input line 25
-0.
-
-
-LaTeX Warning: Reference `fig:q4-horizon' on page 39 undefined on input line 25
-0.
-
-
-LaTeX Warning: Reference `sec:q4-struct' on page 39 undefined on input line 255
-.
-
-
-LaTeX Warning: Reference `tab:q4-ablation' on page 39 undefined on input line 2
-81.
-
-
-LaTeX Warning: Reference `fig:q4-ladder' on page 39 undefined on input line 281
-.
-
-[39]
-
-LaTeX Warning: Reference `eq:q4-prefix' on page 40 undefined on input line 285.
-
-
-[40]
-
-LaTeX Warning: Reference `tab:q4-prm' on page 41 undefined on input line 312.
-
-
-LaTeX Warning: Reference `tab:q4-sel' on page 41 undefined on input line 337.
-
-[41]
-
-LaTeX Warning: Reference `fig:q4-regret' on page 42 undefined on input line 367
-.
-
-
-LaTeX Warning: Reference `fig:q4-regret' on page 42 undefined on input line 371
-.
-
-[42]
-
-LaTeX Warning: Reference `sec:q4-horizon-gain' on page 43 undefined on input li
-ne 380.
-
-
-LaTeX Warning: Reference `sec:q4-sens' on page 43 undefined on input line 386.
-
-
-LaTeX Warning: Reference `sec:q4-selector' on page 43 undefined on input line 3
-87.
-
-
-LaTeX Warning: Reference `sec:q4-horizon-gain' on page 43 undefined on input li
-ne 388.
-
-
-LaTeX Warning: Reference `eq:q4-prm' on page 43 undefined on input line 390.
-
-[43]) (./sections/09-evaluation.tex
-
-LaTeX Warning: Reference `eq:q3-adjust' on page 44 undefined on input line 12.
-
-[44]) [45] (./backmatter/references.tex) (./backmatter/appendix.tex
-
-LaTeX Warning: Reference `sec:q3-forecast' on page 46 undefined on input line 1
-8.
-
-
-LaTeX Warning: Reference `sec:q3-adjust' on page 46 undefined on input line 18.
-
-
-
-LaTeX Warning: Reference `fig:q3-matrix' on page 46 undefined on input line 19.
-
-
-
-LaTeX Warning: Reference `fig:q3-month' on page 46 undefined on input line 19.
-
-
-LaTeX Warning: Reference `sec:q4-model' on page 46 undefined on input line 20.
-
-
-LaTeX Warning: Reference `sec:q4-check' on page 46 undefined on input line 20.
-
-
-LaTeX Warning: Reference `fig:q4-struct' on page 46 undefined on input line 21.
-
-
-
-LaTeX Warning: Reference `fig:q4-regret' on page 46 undefined on input line 21.
-
-
-[46] [47] [48] [49] [50] [51] [52]) [53] (./main.aux)
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `main.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
- )
-Output written on main.xdv (53 pages, 759540 bytes).
+(c:/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd) [1])
+(./sections/01-restatement.tex) (./sections/02-analysis.tex [2] [3])
+(./sections/03-assumptions.tex [4] [5] [6]) (./sections/04-problem1.tex
+[7] [8] [9] [10] [11]) (./sections/05-problem2-model.tex [12] [13] [14]
+[15] [16]) (./sections/06-problem2-results.tex [17] [18] [19] [20] [21]
+[22] [23] [24]) (./sections/07-problem3.tex [25] [26] [27] [28] [29] [30]
+[31]) (./sections/08-problem4.tex [32] [33] [34] [35] [36] [37] [38] [39]
+[40] [41] [42] [43] [44] [45]) (./sections/09-evaluation.tex [46]) [47]
+[48] (./backmatter/declaration.tex) [49] (./backmatter/references.tex)
+(./backmatter/appendix.tex [50] [51] [52] [53] [54] [55] [56] [57] [58]
+[59]) [60] (./main.aux) )
+Output written on main.xdv (60 pages, 941808 bytes).
 SyncTeX written on main.synctex.gz.
 
 Transcript written on main.log.
 Latexmk: Getting log file 'main.log'
 Latexmk: Examining 'main.fls'
 Latexmk: Examining 'main.log'
-Latexmk: References changed.
-Latexmk: References changed.
-Latexmk: References changed.
 Latexmk: Log file says output to 'main.xdv'
 Latexmk: Using bibtex to make bibliography file(s).
 Latexmk: applying rule 'xelatex'...
 Rule 'xelatex':  Reasons for rerun
 Changed files or newly in use/created:
   main.aux
-  main.out
 
 ------------
 Run number 2 of rule 'xelatex'
@@ -752,17 +278,18 @@ For additional information on amsmath, use the `?' option.
 *geometry* detected driver: xetex
 (./main.out) (./main.out) (./sections/00-abstract.tex
 (c:/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd)
-(c:/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd) [1] [2])
-(./sections/01-restatement.tex) (./sections/02-analysis.tex [3] [4] [5]
-[6]) (./sections/03-assumptions.tex [7]) (./sections/04-problem1.tex [8]
-[9] [10] [11] [12]) (./sections/05-problem2-model.tex [13] [14] [15] [16])
-(./sections/06-problem2-results.tex [17] [18] [19] [20] [21] [22] [23])
-(./sections/07-problem3.tex [24] [25] [26] [27] [28] [29] [30] [31])
-(./sections/08-problem4.tex [32] [33] [34] [35] [36] [37] [38] [39] [40]
-[41] [42] [43]) (./sections/09-evaluation.tex [44]) [45]
-(./backmatter/references.tex) (./backmatter/appendix.tex [46] [47] [48]
-[49] [50] [51] [52]) [53] (./main.aux) )
-Output written on main.xdv (53 pages, 788084 bytes).
+(c:/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd) [1])
+(./sections/01-restatement.tex) (./sections/02-analysis.tex [2] [3])
+(./sections/03-assumptions.tex [4] [5] [6]) (./sections/04-problem1.tex
+[7] [8] [9] [10] [11]) (./sections/05-problem2-model.tex [12] [13] [14]
+[15] [16]) (./sections/06-problem2-results.tex [17] [18] [19] [20] [21]
+[22] [23] [24]) (./sections/07-problem3.tex [25] [26] [27] [28] [29] [30]
+[31]) (./sections/08-problem4.tex [32] [33] [34] [35] [36] [37] [38] [39]
+[40] [41] [42] [43] [44] [45]) (./sections/09-evaluation.tex [46]) [47]
+[48] (./backmatter/declaration.tex) [49] (./backmatter/references.tex)
+(./backmatter/appendix.tex [50] [51] [52] [53] [54] [55] [56] [57] [58]
+[59]) [60] (./main.aux) )
+Output written on main.xdv (60 pages, 941808 bytes).
 SyncTeX written on main.synctex.gz.
 
 Transcript written on main.log.
@@ -777,8 +304,6 @@ Changed files or newly in use/created:
   main.xdv
 Category 'changed_source_rules':
   xelatex
-Category 'no_dest':
-  xdvipdfmx
 
 ------------
 Run number 1 of rule 'xdvipdfmx'
@@ -787,7 +312,7 @@ Run number 1 of rule 'xdvipdfmx'
 Running 'xdvipdfmx -E -o "main.pdf"  "main.xdv"'
 ------------
 main.xdv -> main.pdf
-[1][2][3][4][5][6][7][8][9][10][11][12][13][14][15][16][17][18][19][20][21][22][23][24][25][26][27][28][29][30][31][32][33][34][35][36][37][38][39][40][41][42][43][44][45][46][47][48][49][50][51][52][53]
-1842279 bytes written
+[1][2][3][4][5][6][7][8][9][10][11][12][13][14][15][16][17][18][19][20][21][22][23][24][25][26][27][28][29][30][31][32][33][34][35][36][37][38][39][40][41][42][43][44][45][46][47][48][49][50][51][52][53][54][55][56][57][58][59][60]
+1910045 bytes written
 Latexmk: All targets (main.xdv main.pdf) are up-to-date
 

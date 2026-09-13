@@ -19,7 +19,10 @@
 %                07-problem3        七、问题三：滚动合同调整模型
 %                08-problem4        八、问题四（留白待补）
 %                09-evaluation      九、模型评价
-%   backmatter/ 参考文献与附录
+%   backmatter/ 声明、参考文献与附录
+%                declaration.tex  AI 工具使用声明
+%                references.tex   参考文献
+%                appendix.tex     支撑材料清单、软件环境、图表对应关系与核心程序
 %   figures/    正文配图（矢量 PDF，由 \graphicspath 统一解析）
 %   code/       附录程序清单（fancyvrb 逐字输入）
 %
@@ -40,7 +43,7 @@
 \input{preamble/layout}
 
 \title{微网与外部电网电力调控的储能调度与购电策略优化}
-\mcmkeywords{储能调度；线性规划；分位数预测；星期偏差校正；序贯决策；滚动合同调整；双向违约电价；实时电价；滚动时域}
+\mcmkeywords{储能调度；线性规划；分位数风险裕量；滚动合同调整；跨日优化}
 
 \begin{document}
 
@@ -55,6 +58,9 @@
 \input{sections/07-problem3}
 \input{sections/08-problem4}
 \input{sections/09-evaluation}
+
+\clearpage
+\input{backmatter/declaration}
 
 \clearpage
 \input{backmatter/references}
